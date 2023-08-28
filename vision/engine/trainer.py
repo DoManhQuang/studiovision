@@ -113,6 +113,13 @@ def train_loop(model, x_train, y_train, x_val, y_val, save_dir):
     steps_per_epoch = len(train_generator) // batch_size
     validation_steps = len(validation_generator) // batch_size
 
+    his_train = {
+        'accuracy': [],
+        'val_accuracy': [],
+        'loss': [],
+        'val_loss': []
+    }
+
     # Training loop
     num_epochs = 100
     for epoch in range(num_epochs):
@@ -127,7 +134,8 @@ def train_loop(model, x_train, y_train, x_val, y_val, save_dir):
         # Calculate validation loss and accuracy at the end of each epoch
         val_loss, val_accuracy = model.evaluate(validation_generator, steps=validation_steps, verbose=0)
         train_loss, train_accuracy = model.evaluate(train_generator, steps=steps_per_epoch, verbose=0)
-        
+        his_train['accuracy'], his_train['loss'], his_train['val_accuracy'], his_train['val_loss'] = train_accuracy, train_loss, val_accuracy, val_loss
+
         print(f"Epoch {epoch}: "
             f"Train Loss = {train_loss:.4f}, Train Accuracy = {train_accuracy:.4f}, "
             f"Validation Loss = {val_loss:.4f}, Validation Accuracy = {val_accuracy:.4f}")
@@ -148,3 +156,4 @@ def train_loop(model, x_train, y_train, x_val, y_val, save_dir):
         # Save last weights
         model.save_weights(os.path.join(os.path.join(save_dir, 'weights'), 'last_model_weights.h5'))
         print("Last weights saved.")
+    return his_train
